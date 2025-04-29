@@ -10,6 +10,16 @@ using DotNetEnv;
 Env.Load(); // Load .env file
 
 var builder = WebApplication.CreateBuilder(args);
+// Add CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
 
 // Add services
 builder.Services.AddControllers()
@@ -27,7 +37,7 @@ var database = Env.GetString("Database")?? "postgres";
 
 var connectionString = $"Host={host};Port={port};Database={database};Username={userName};Password={password}";
 
-Console.WriteLine($"Loaded Connection String: {connectionString}");
+// Console.WriteLine($"Loaded Connection String: {connectionString}");
 
 if (string.IsNullOrEmpty(connectionString))
 {
@@ -64,7 +74,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
-
+app.UseCors("AllowAll");
 // Configure middleware
 if (app.Environment.IsDevelopment())
 {

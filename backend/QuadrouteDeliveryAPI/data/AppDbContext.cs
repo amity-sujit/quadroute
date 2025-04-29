@@ -59,6 +59,8 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Order>().ToTable("orders");
         modelBuilder.Entity<Order>().Property(o => o.OrderId).HasColumnName("order_id");
         modelBuilder.Entity<Order>().Property(o => o.CustomerId).HasColumnName("customer_id");
+        modelBuilder.Entity<Order>().Property(o => o.VehicleId).HasColumnName("vehicle_id");
+        modelBuilder.Entity<Order>().HasOne<Vehicle>().WithMany().HasForeignKey(o => o.VehicleId);
         modelBuilder.Entity<Order>().Property(o => o.MilkType).HasColumnName("milk_type");
         modelBuilder.Entity<Order>().Property(o => o.QuantityLiters).HasColumnName("quantity_liters");
         modelBuilder.Entity<Order>().Property(o => o.DeliveryDate).HasColumnName("delivery_date");
@@ -113,6 +115,7 @@ public class Order
 {
     public required string OrderId { get; set; }
     public required string CustomerId { get; set; }
+    public string? VehicleId { get; set; } // Add this field
     public required string MilkType { get; set; }
     public required int QuantityLiters { get; set; }
     public required DateTime DeliveryDate { get; set; }
