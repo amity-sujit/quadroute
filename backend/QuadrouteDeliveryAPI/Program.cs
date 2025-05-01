@@ -29,14 +29,15 @@ builder.Services.AddControllers()
     });
 
 // Construct the connection string using the password from .env
-var password = Env.GetString("SUPABASE_PASSWORD");
+var password = Env.GetString("SUPABASE_PASSWORD")??"Postgre2025";
 var host = Env.GetString("Host")??"localhost";
 var port = Env.GetString("Port")??"5432";
 var userName = Env.GetString("Username")??"postgres";
 var database = Env.GetString("Database")?? "postgres";
 
 var connectionString = $"Host={host};Port={port};Database={database};Username={userName};Password={password}";
-
+connectionString = "Host=db.tggxztoybbbawzzagzet.supabase.co;Port=5432;Database=postgres;Username=postgres;Password=Postgre2025";
+connectionString="User Id=postgres.tggxztoybbbawzzagzet;Password=Postgre2025;Server=aws-0-ap-southeast-1.pooler.supabase.com;Port=5432;Database=postgres";
 // Console.WriteLine($"Loaded Connection String: {connectionString}");
 
 if (string.IsNullOrEmpty(connectionString))

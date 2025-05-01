@@ -22,7 +22,14 @@ public class CustomersController : ControllerBase
         var customers = _context.Customers.ToList();
         return Ok(customers);
     }
-
+    [HttpGet("/verify/1")]
+    public IActionResult GetCustomersverify()
+    {
+        var ordertype = new List<OrderType>();
+        ordertype.Add( new OrderType(){OrderTypeId="5",Type="Geer"});
+        ordertype.AddRange(_context.OrderTypes.ToList());
+        return Ok(ordertype);
+    }
     [HttpGet("{id}")]
     public IActionResult GetCustomerById(string id)
     {

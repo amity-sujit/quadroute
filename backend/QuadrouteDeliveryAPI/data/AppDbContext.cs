@@ -10,6 +10,7 @@ public class AppDbContext : DbContext
     public DbSet<Store> Stores { get; set; }
     public DbSet<Vehicle> Vehicles { get; set; }
     public DbSet<Order> Orders { get; set; }
+    public DbSet<OrderType> OrderTypes { get; set; }
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
@@ -71,7 +72,19 @@ public class AppDbContext : DbContext
             .HasOne<Customer>()
             .WithMany()
             .HasForeignKey(o => o.CustomerId);
+        
+        modelBuilder.Entity<OrderType>().ToTable("ordertype");
+        modelBuilder.Entity<OrderType>().Property(ot => ot.OrderTypeId).HasColumnName("OrderTypeId");
+        modelBuilder.Entity<OrderType>().Property(ot => ot.Type).HasColumnName("Type");
+        
     }
+}
+
+public class OrderType
+{
+   public required string OrderTypeId{get;set;} 
+   public required string Type{get;set;} 
+
 }
 
 public class Customer
