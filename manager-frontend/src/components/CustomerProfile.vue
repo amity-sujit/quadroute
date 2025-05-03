@@ -111,7 +111,7 @@ export default defineComponent({
     const fetchCustomer = async () => {
       try {
         console.log('Fetching customer with ID:', customerId)
-        const response = await axios.get<Customer>(`https://www.quadroutedeliveryapi.somee.com/api/customers/${customerId}`)
+        const response = await axios.get<Customer>(`https://quadroutedeliveryapi.somee.com/api/customers/${customerId}`)
         console.log('Customer fetched:', response.data)
         customer.value = response.data
       } catch (err) {
@@ -123,7 +123,7 @@ export default defineComponent({
     const fetchOrders = async () => {
       try {
         console.log('Fetching orders for customer ID:', customerId)
-        const response = await axios.get<Order[]>(`https://www.quadroutedeliveryapi.somee.com/api/orders/customer/${customerId}`)
+        const response = await axios.get<Order[]>(`https://quadroutedeliveryapi.somee.com/api/orders/customer/${customerId}`)
         console.log('Orders fetched:', response.data)
         orders.value = response.data
         if (orders.value.length > 0) {
@@ -140,7 +140,7 @@ export default defineComponent({
       try {
         const [startTime, endTime] = timeWindow.split('-')
         console.log('Fetching available vehicles for time window:', timeWindow)
-        const response = await axios.get<Vehicle[]>(`https://www.quadroutedeliveryapi.somee.com/api/vehicles/available?startTime=${startTime}:00&endTime=${endTime}:00`)
+        const response = await axios.get<Vehicle[]>(`https://quadroutedeliveryapi.somee.com/api/vehicles/available?startTime=${startTime}:00&endTime=${endTime}:00`)
         console.log('Available vehicles:', response.data)
         availableVehicles.value = response.data
       } catch (err) {
@@ -159,7 +159,7 @@ export default defineComponent({
 
       try {
         console.log('Assigning vehicle to order:', selectedOrder.value.orderId, selectedVehicleId.value)
-        await axios.post(`https://www.quadroutedeliveryapi.somee.com/api/orders/${selectedOrder.value.orderId}/assign-vehicle`, {
+        await axios.post(`https://quadroutedeliveryapi.somee.com/api/orders/${selectedOrder.value.orderId}/assign-vehicle`, {
           vehicleId: selectedVehicleId.value
         })
         await fetchOrders()

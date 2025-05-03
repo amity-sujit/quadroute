@@ -1,6 +1,7 @@
 // Data/AppDbContext.cs
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
+using QuadrouteDeliveryAPI.Models;
 
 namespace QuadrouteDeliveryAPI.Data;
 
@@ -11,11 +12,36 @@ public class AppDbContext : DbContext
     public DbSet<Vehicle> Vehicles { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderType> OrderTypes { get; set; }
+    public DbSet<Tenant> Tenants { get; set; }
+    public DbSet<EndCustomer> EndCustomers { get; set; }
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<EndCustomer>().ToTable("endcustomers");
+        modelBuilder.Entity<Tenant>().ToTable("tenants");
+        modelBuilder.Entity<EndCustomer>().Property(e => e.CustomerId).HasColumnName("customer_id");
+        modelBuilder.Entity<EndCustomer>().Property(e => e.Name).HasColumnName("name");
+        modelBuilder.Entity<EndCustomer>().Property(e => e.Address).HasColumnName("address");
+        modelBuilder.Entity<EndCustomer>().Property(e => e.Phone).HasColumnName("phone");
+        modelBuilder.Entity<EndCustomer>().Property(e => e.TenantId).HasColumnName("tenant_id");
+        modelBuilder.Entity<EndCustomer>().Property(e => e.CreatedAt).HasColumnName("created_at");
+        modelBuilder.Entity<EndCustomer>().Property(e => e.IsVerified).HasColumnName("is_verified");
+        modelBuilder.Entity<EndCustomer>().Property(e => e.Latitude).HasColumnName("latitude");
+        modelBuilder.Entity<EndCustomer>().Property(e => e.Longitude).HasColumnName("longitude");
+        
+         modelBuilder.Entity<Tenant>()
+                .HasKey(t => t.TenantId);
+
+            modelBuilder.Entity<EndCustomer>()
+                .HasKey(c => c.CustomerId);
+
+            modelBuilder.Entity<EndCustomer>()
+                .HasOne(c => c.Tenant)
+                .WithMany(t => t.EndCustomers)
+                .HasForeignKey(c => c.TenantId);
+
         modelBuilder.Entity<Customer>()
             .Property(c => c.Location)
             .HasColumnType("geography (point)");

@@ -16,13 +16,16 @@ import L, { Map, Marker, LatLngExpression, LatLngBounds, Icon } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import axios from 'axios'
 import { Customer } from '../types/customer'
+
 // Fix Leaflet default marker icons
 delete (L.Icon.Default.prototype as any)._getIconUrl
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: '/leaflet/marker-icon-2x.png',
   iconUrl: '/leaflet/marker-icon.png',
   shadowUrl: '/leaflet/marker-shadow.png'
+
 })
+
 export default defineComponent({
   name: 'CustomerMap',
   setup () {
@@ -35,7 +38,7 @@ export default defineComponent({
     const fetchCustomers = async () => {
       try {
         console.log('Fetching customers...')
-        const response = await axios.get<Customer[]>('https://www.quadroutedeliveryapi.somee.com/api/customers')
+        const response = await axios.get<Customer[]>('https://quadroutedeliveryapi.somee.com/api/customers')
         console.log('Customers fetched:', response.data)
         customers.value = response.data
       } catch (err) {

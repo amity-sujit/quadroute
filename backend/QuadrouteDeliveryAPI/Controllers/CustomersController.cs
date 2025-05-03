@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using QuadrouteDeliveryAPI.Data;
 using NetTopologySuite.Geometries;
+using QuadrouteDeliveryAPI.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace QuadrouteDeliveryAPI.Controllers;
 
@@ -10,6 +12,7 @@ namespace QuadrouteDeliveryAPI.Controllers;
 public class CustomersController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly Guid _fixedTenantId = Guid.Parse("6fb59d40-20f1-4545-a418-831ecd24484e");
 
     public CustomersController(AppDbContext context)
     {
@@ -106,4 +109,82 @@ public class CustomersController : ControllerBase
 
         return NoContent();
     }
+    
+    // [HttpGet("/api/tenants/{tenantId}/customers/")]
+    // public IActionResult GetEndCustomers()
+    // {
+    //     var customers = _context.EndCustomers.ToList();
+    //     return Ok(customers);
+    // }
+    [HttpGet("/api/tenants/{tenantId}/customers")]
+    public IActionResult SearchEndCustomers([FromRoute]string tenantId,[FromQuery] string phone,[FromQuery] string name="")
+    {
+        var customers = _context.EndCustomers.ToList();
+        if(string.IsNullOrEmpty(phone) && string.IsNullOrEmpty(name))
+        {
+           return Ok(customers);
+        }
+        
+        // Console.Write("phone number is : ");
+        // Console.WriteLine(phone);
+        // Console.WriteLine(customers.Count);
+
+        customers = new List<EndCustomer>(){customers.FirstOrDefault(x=>x.Phone==phone && !string.IsNullOrWhiteSpace(phone) && phone.Length==10)??new EndCustomer()};
+        return Ok(customers);
+    }
+    [HttpGet("/api/tenants")]
+    public IActionResult SearchTenants(string tenantId,[FromQuery] string name="")
+    {
+        // var customers = _context.Tenants.ToList();
+       var      tenants= _context.Tenants.Where(x=>x.Name.Contains(name) & !string.IsNullOrWhiteSpace(name)).ToList();
+        return Ok(tenants);
+    }
+    
+    // GET: api/tenants/{tenantId}/customers/{customerId}
+    [HttpGet("/api/tenants/{tenantId}/customers/{customerId}")]
+    public async Task<ActionResult<EndCustomer>> GetCustomer(string customerId,string tenantId = "6fb59d40-20f1-4545-a418-831ecd24484e")
+    {
+        if (!Guid.TryParse(tenantId, out var tenantGuid) || !Guid.TryParse(customerId, out var customerGuid))
+            return BadRequest("Invalid ID format");
+
+        var customer = await _context.EndCustomers
+            .Where(c => c.TenantId == tenantGuid && c.CustomerId == customerGuid)
+            .FirstOrDefaultAsync();
+
+        if (customer == null)
+            return NotFound();
+
+        return Ok(customer);
+    }
+
+    // PATCH: api/tenants/{tenantId}/customers/{customerId}
+    [HttpPatch("/api/tenants/{tenantId}/customers/{customerId}")]
+    public async Task<IActionResult> UpdateLocation(string customerId, [FromBody] UpdateLocationDto dto,string tenantId = "6fb59d40-20f1-4545-a418-831ecd24484e")
+    {
+        if (!Guid.TryParse(tenantId, out var tenantGuid) || !Guid.TryParse(customerId, out var customerGuid))
+            return BadRequest("Invalid ID format");
+
+        var customer = await _context.EndCustomers
+            .Where(c => c.TenantId == tenantGuid && c.CustomerId == customerGuid)
+            .FirstOrDefaultAsync();
+
+        if (customer == null)
+            return NotFound();
+
+        customer.Latitude = dto.Latitude;
+        customer.Longitude = dto.Longitude;
+        customer.IsVerified = dto.IsVerified;
+        customer.Address = dto.Address; // Optional, for manual address updates
+
+        await _context.SaveChangesAsync();
+        return Ok();
+    }
 }
+
+    public class UpdateLocationDto
+    {
+        public float? Latitude { get; set; }
+        public float? Longitude { get; set; }
+        public bool IsVerified { get; set; }
+        public string Address { get; set; }
+    }
