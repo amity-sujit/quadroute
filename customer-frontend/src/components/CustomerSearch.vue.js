@@ -57,6 +57,7 @@ __VLS_asFunctionalElement(__VLS_intrinsicElements.form, __VLS_intrinsicElements.
 });
 __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
     ...{ class: "form-group" },
+    ...{ style: {} },
 });
 __VLS_asFunctionalElement(__VLS_intrinsicElements.label, __VLS_intrinsicElements.label)({
     for: "name",
@@ -66,7 +67,6 @@ __VLS_asFunctionalElement(__VLS_intrinsicElements.input)({
     value: (__VLS_ctx.search.name),
     type: "text",
     placeholder: "Enter your name",
-    required: true,
 });
 __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
     ...{ class: "form-group" },
@@ -98,19 +98,18 @@ if (__VLS_ctx.customers.length > 0) {
     __VLS_asFunctionalElement(__VLS_intrinsicElements.ul, __VLS_intrinsicElements.ul)({});
     for (const [customer] of __VLS_getVForSourceType((__VLS_ctx.customers))) {
         __VLS_asFunctionalElement(__VLS_intrinsicElements.li, __VLS_intrinsicElements.li)({
-            key: (customer.id),
+            key: (customer.customerId),
         });
         const __VLS_0 = {}.RouterLink;
         /** @type {[typeof __VLS_components.RouterLink, typeof __VLS_components.routerLink, typeof __VLS_components.RouterLink, typeof __VLS_components.routerLink, ]} */ ;
         // @ts-ignore
         const __VLS_1 = __VLS_asFunctionalComponent(__VLS_0, new __VLS_0({
-            to: (`/customer/${__VLS_ctx.tenantId}/${customer.id}`),
+            to: (`/customer/${__VLS_ctx.tenantId}/${customer.customerId}`),
         }));
         const __VLS_2 = __VLS_1({
-            to: (`/customer/${__VLS_ctx.tenantId}/${customer.id}`),
+            to: (`/customer/${__VLS_ctx.tenantId}/${customer.customerId}`),
         }, ...__VLS_functionalComponentArgsRest(__VLS_1));
         __VLS_3.slots.default;
-        (customer.id);
         (customer.name);
         (customer.phone);
         var __VLS_3;

@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using NetTopologySuite.Geometries;
 using DotNetEnv;
+using DairyDistribution.Data;
 
 Env.Load(); // Load .env file
 
@@ -25,6 +26,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
         options.JsonSerializerOptions.Converters.Add(new PointConverter());
     });
 
@@ -38,6 +41,7 @@ var database = Env.GetString("Database")?? "postgres";
 var connectionString = $"Host={host};Port={port};Database={database};Username={userName};Password={password}";
 connectionString = "Host=db.tggxztoybbbawzzagzet.supabase.co;Port=5432;Database=postgres;Username=postgres;Password=Postgre2025";
 connectionString="User Id=postgres.tggxztoybbbawzzagzet;Password=Postgre2025;Server=aws-0-ap-southeast-1.pooler.supabase.com;Port=5432;Database=postgres";
+var dairyDBConnectionString=@"User Id=postgres.brtuyqhyzipdkengoysx;Password=Postgre2025;Server=aws-0-ap-southeast-1.pooler.supabase.com;Port=5432;Database=postgres";
 // Console.WriteLine($"Loaded Connection String: {connectionString}");
 
 if (string.IsNullOrEmpty(connectionString))
@@ -68,6 +72,30 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         throw;
     }
 });
+builder.Services.AddDbContext<DairyDbContext>(options =>
+{
+    try
+    {
+        options.UseNpgsql(dairyDBConnectionString,
+            npgsqlOptions =>
+            {
+                npgsqlOptions.UseNetTopologySuite();
+                npgsqlOptions.EnableRetryOnFailure(3, TimeSpan.FromSeconds(5), null);
+            })
+            .LogTo(Console.WriteLine, LogLevel.Information);
+    }
+    catch (Npgsql.NpgsqlException ex)
+    {
+        Console.WriteLine($"DairyNpgsql Error: {ex.Message}");
+        throw;
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"DairyDbContext Error: {ex.Message}");
+        throw;
+    }
+});
+
 
 builder.Services.AddSwaggerGen(c =>
 {
